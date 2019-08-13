@@ -1,0 +1,5 @@
+
+strong@foreverstrong:~/tensorflow_work/R2CNN_Faster-RCNN_Tensorflow/tools$ python camera_demo.py --gpu='0'
+
+strong@foreverstrong:~/tensorflow_work/R2CNN_Faster-RCNN_Tensorflow/tools$ python oriented_bounding_box_camera_face.py --gpu='0'
+

@@ -107,7 +107,6 @@ ENV/
 *.meta
 events.*
 checkpoint
-.idea/
 __pycache__/
 *.json
 *.zip
@@ -115,7 +114,16 @@ __pycache__/
 */tools/demos/*
 */tools/test_dota/*
 */tools/test_icdar2015/*
-*/output/*
 */data/pretrained_weights/*
 */data/tfrecord/*
+
+
+# .idea folder
+.idea/
+
+# weights
+output/trained_weights/FasterRCNN_20180623_FDDB_mobile_v1/
+
+
+
 

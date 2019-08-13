@@ -26,7 +26,7 @@ def short_side_resize_for_inference_data(img_tensor, target_shortside_len, is_re
         new_h, new_w = tf.cond(tf.less(h, w),
                                true_fn=lambda: (target_shortside_len, target_shortside_len * w // h),
                                false_fn=lambda: (target_shortside_len * h // w, target_shortside_len))
-        img_tensor = tf.image.resize_bilinear(img_tensor, [new_h, new_w])
+        img_tensor = tf.image.resize_bilinear(img_tensor, [new_h, new_w], align_corners=True)
 
     return img_tensor  # [1, h, w, c]
 

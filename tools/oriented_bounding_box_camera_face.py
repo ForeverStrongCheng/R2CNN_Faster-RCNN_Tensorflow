@@ -108,6 +108,7 @@ def inference(det_net, device_index):
                     feed_dict={img_placeholder: frame})
 
             end = time.time()
+
             # det_detections_h = draw_box_in_img.draw_box_cv(np.squeeze(resized_img, 0),
             #                                                boxes=det_boxes_h_,
             #                                                labels=det_category_h_,
@@ -176,7 +177,7 @@ if __name__ == '__main__':
     print('args.gpu:', args.gpu)
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-    print("os.environ['CUDA_VISIBLE_DEVICES':", os.environ['CUDA_VISIBLE_DEVICES'])
+    print("os.environ['CUDA_VISIBLE_DEVICES']:", os.environ['CUDA_VISIBLE_DEVICES'])
 
     det_net = build_whole_network.DetectionNetwork(base_network_name=cfgs.NET_NAME, is_training=False)
 

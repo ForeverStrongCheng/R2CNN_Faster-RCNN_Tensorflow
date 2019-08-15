@@ -1,11 +1,11 @@
-# -*-coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import, division, print_function
 
 import os
+import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-import numpy as np
 
 from libs.networks import resnet
 from libs.networks import mobilenet_v2
@@ -22,9 +22,7 @@ from libs.box_utils import nms_rotate
 
 
 class DetectionNetwork(object):
-
     def __init__(self, base_network_name, is_training):
-
         self.base_network_name = base_network_name
         self.is_training = is_training
         self.num_anchors_per_location = len(cfgs.ANCHOR_SCALES) * len(cfgs.ANCHOR_RATIOS)
@@ -38,7 +36,7 @@ class DetectionNetwork(object):
             return mobilenet_v2.mobilenetv2_base(input_img_batch, is_training=self.is_training)
 
         else:
-            raise ValueError('Sry, we only support resnet or mobilenet_v2')
+            raise ValueError('Sorry, we only support resnet_v1 or MobilenetV2')
 
     def postprocess_fastrcnn_h(self, rois, bbox_ppred, scores, img_shape):
 
@@ -62,8 +60,7 @@ class DetectionNetwork(object):
             allclasses_boxes = []
             allclasses_scores = []
             categories = []
-            for i in range(1, cfgs.CLASS_NUM+1):
-
+            for i in range(1, cfgs.CLASS_NUM + 1):
                 # 1. decode boxes in each class
                 tmp_encoded_box = bbox_pred_list[i]
                 tmp_score = score_list[i]
@@ -128,8 +125,7 @@ class DetectionNetwork(object):
             allclasses_boxes = []
             allclasses_scores = []
             categories = []
-            for i in range(1, cfgs.CLASS_NUM+1):
-
+            for i in range(1, cfgs.CLASS_NUM + 1):
                 # 1. decode boxes in each class
                 tmp_encoded_box = bbox_pred_list[i]
                 tmp_score = score_list[i]
@@ -232,22 +228,21 @@ class DetectionNetwork(object):
             # 7. cls and reg in Fast-RCNN
             with tf.variable_scope('horizen_branch'):
                 with slim.arg_scope([slim.fully_connected], weights_regularizer=slim.l2_regularizer(cfgs.WEIGHT_DECAY)):
-
                     cls_score_h = slim.fully_connected(fc_flatten,
-                                                       num_outputs=cfgs.CLASS_NUM+1,
+                                                       num_outputs=cfgs.CLASS_NUM + 1,
                                                        weights_initializer=cfgs.INITIALIZER,
                                                        activation_fn=None, trainable=self.is_training,
                                                        scope='cls_fc_h')
 
                     bbox_pred_h = slim.fully_connected(fc_flatten,
-                                                       num_outputs=(cfgs.CLASS_NUM+1) * 4,
+                                                       num_outputs=(cfgs.CLASS_NUM + 1) * 4,
                                                        weights_initializer=cfgs.BBOX_INITIALIZER,
                                                        activation_fn=None, trainable=self.is_training,
                                                        scope='reg_fc_h')
                     # for convient. It also produce (cls_num +1) bboxes
 
-                    cls_score_h = tf.reshape(cls_score_h, [-1, cfgs.CLASS_NUM+1])
-                    bbox_pred_h = tf.reshape(bbox_pred_h, [-1, 4*(cfgs.CLASS_NUM+1)])
+                    cls_score_h = tf.reshape(cls_score_h, [-1, cfgs.CLASS_NUM + 1])
+                    bbox_pred_h = tf.reshape(bbox_pred_h, [-1, 4 * (cfgs.CLASS_NUM + 1)])
 
             with tf.variable_scope('rotation_branch'):
                 with slim.arg_scope([slim.fully_connected], weights_regularizer=slim.l2_regularizer(cfgs.WEIGHT_DECAY)):
@@ -387,13 +382,15 @@ class DetectionNetwork(object):
     def build_whole_detection_network(self, input_img_batch, gtboxes_r_batch, gtboxes_h_batch):
 
         if self.is_training:
-            # ensure shape is [M, 5] and [M, 6]
+            # Ensure shape is [M, 5] and [M, 6].
             gtboxes_r_batch = tf.reshape(gtboxes_r_batch, [-1, 6])
             gtboxes_h_batch = tf.reshape(gtboxes_h_batch, [-1, 5])
             gtboxes_r_batch = tf.cast(gtboxes_r_batch, tf.float32)
             gtboxes_h_batch = tf.cast(gtboxes_h_batch, tf.float32)
 
         img_shape = tf.shape(input_img_batch)
+        # debug message:[1 h w 3][yongqiang]
+        # img_shape = tf.Print(img_shape, [img_shape, "yongqiang"], message='debug message:', summarize=9)
 
         # 1. build base network
         feature_to_cropped = self.build_base_network(input_img_batch)
@@ -407,11 +404,11 @@ class DetectionNetwork(object):
                 trainable=self.is_training, weights_initializer=cfgs.INITIALIZER,
                 activation_fn=tf.nn.relu,
                 scope='rpn_conv/3x3')
-            rpn_cls_score = slim.conv2d(rpn_conv3x3, self.num_anchors_per_location*2, [1, 1], stride=1,
+            rpn_cls_score = slim.conv2d(rpn_conv3x3, self.num_anchors_per_location * 2, [1, 1], stride=1,
                                         trainable=self.is_training, weights_initializer=cfgs.INITIALIZER,
                                         activation_fn=None,
                                         scope='rpn_cls_score')
-            rpn_box_pred = slim.conv2d(rpn_conv3x3, self.num_anchors_per_location*4, [1, 1], stride=1,
+            rpn_box_pred = slim.conv2d(rpn_conv3x3, self.num_anchors_per_location * 4, [1, 1], stride=1,
                                        trainable=self.is_training, weights_initializer=cfgs.BBOX_INITIALIZER,
                                        activation_fn=None,
                                        scope='rpn_bbox_pred')
@@ -465,7 +462,7 @@ class DetectionNetwork(object):
                                                                                     boxes=score_gre_05_rois,
                                                                                     scores=score_gre_05_score)
                 tf.summary.image('score_greater_05_rois', score_gre_05_in_img)
-            # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         if self.is_training:
             with tf.variable_scope('sample_anchors_minibatch'):
@@ -484,21 +481,22 @@ class DetectionNetwork(object):
             rpn_cls_category = tf.argmax(rpn_cls_prob, axis=1)
             kept_rpppn = tf.reshape(tf.where(tf.not_equal(rpn_labels, -1)), [-1])
             rpn_cls_category = tf.gather(rpn_cls_category, kept_rpppn)
-            acc = tf.reduce_mean(tf.to_float(tf.equal(rpn_cls_category, tf.to_int64(tf.gather(rpn_labels, kept_rpppn)))))
+            acc = tf.reduce_mean(
+                tf.to_float(tf.equal(rpn_cls_category, tf.to_int64(tf.gather(rpn_labels, kept_rpppn)))))
             tf.summary.scalar('ACC/rpn_accuracy', acc)
 
             with tf.control_dependencies([rpn_labels]):
                 with tf.variable_scope('sample_RCNN_minibatch'):
                     rois, labels, bbox_targets_h, bbox_targets_r = \
-                    tf.py_func(proposal_target_layer,
-                               [rois, gtboxes_h_batch, gtboxes_r_batch],
-                               [tf.float32, tf.float32, tf.float32, tf.float32])
+                        tf.py_func(proposal_target_layer,
+                                   [rois, gtboxes_h_batch, gtboxes_r_batch],
+                                   [tf.float32, tf.float32, tf.float32, tf.float32])
 
                     rois = tf.reshape(rois, [-1, 4])
                     labels = tf.to_int32(labels)
                     labels = tf.reshape(labels, [-1])
-                    bbox_targets_h = tf.reshape(bbox_targets_h, [-1, 4*(cfgs.CLASS_NUM+1)])
-                    bbox_targets_r = tf.reshape(bbox_targets_r, [-1, 5*(cfgs.CLASS_NUM+1)])
+                    bbox_targets_h = tf.reshape(bbox_targets_h, [-1, 4 * (cfgs.CLASS_NUM + 1)])
+                    bbox_targets_r = tf.reshape(bbox_targets_r, [-1, 5 * (cfgs.CLASS_NUM + 1)])
                     self.add_roi_batch_img_smry(input_img_batch, rois, labels)
 
         # -------------------------------------------------------------------------------------------------------------#
@@ -526,7 +524,7 @@ class DetectionNetwork(object):
             fast_acc_r = tf.reduce_mean(tf.to_float(tf.equal(cls_category_r, tf.to_int64(labels))))
             tf.summary.scalar('ACC/fast_acc_r', fast_acc_r)
 
-        #  6. postprocess_fastrcnn
+        # 6. postprocess_fastrcnn
         if not self.is_training:
             final_boxes_h, final_scores_h, final_category_h = self.postprocess_fastrcnn_h(rois=rois,
                                                                                           bbox_ppred=bbox_pred_h,
@@ -585,6 +583,7 @@ class DetectionNetwork(object):
             print("model restore from pretrained mode, path is :", checkpoint_path)
 
             model_variables = slim.get_model_variables()
+
             # print(model_variables)
 
             def name_in_ckpt_rpn(var):
@@ -600,7 +599,7 @@ class DetectionNetwork(object):
 
             nameInCkpt_Var_dict = {}
             for var in model_variables:
-                if var.name.startswith('Fast-RCNN/'+self.base_network_name+'/block4'):
+                if var.name.startswith('Fast-RCNN/' + self.base_network_name + '/block4'):
                     var_name_in_ckpt = name_in_ckpt_fastrcnn_head(var)
                     nameInCkpt_Var_dict[var_name_in_ckpt] = var
                 else:
@@ -613,7 +612,7 @@ class DetectionNetwork(object):
             for key, item in restore_variables.items():
                 print("var_in_graph: ", item.name)
                 print("var_in_ckpt: ", key)
-                print(20*"---")
+                print(20 * "---")
             restorer = tf.train.Saver(restore_variables)
             print(20 * "****")
             print("restore from pretrained_weighs in IMAGE_NET")
@@ -658,23 +657,3 @@ class DetectionNetwork(object):
                     grad = tf.multiply(grad, scale)
                 final_gradients.append((grad, var))
         return final_gradients
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -56,6 +56,7 @@ def inference(det_net, device_index):
 
     img_batch = short_side_resize_for_inference_data(img_tensor=img_batch, target_shortside_len=cfgs.IMG_SHORT_SIDE_LEN,
                                                      is_resize=False)
+    # img_batch: [1, h, w, c]
 
     det_boxes_h, det_scores_h, det_category_h, \
     det_boxes_r, det_scores_r, det_category_r = det_net.build_whole_detection_network(input_img_batch=img_batch,

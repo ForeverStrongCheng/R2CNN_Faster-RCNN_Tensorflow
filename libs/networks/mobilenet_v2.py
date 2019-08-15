@@ -8,6 +8,7 @@ from libs.networks.mobilenet import mobilenet_v2
 from libs.networks.mobilenet.mobilenet import training_scope
 from libs.networks.mobilenet.mobilenet_v2 import op
 from libs.networks.mobilenet.mobilenet_v2 import ops
+
 expand_input = ops.expand_input_by_factor
 
 V2_BASE_DEF = dict(
@@ -46,7 +47,6 @@ V2_BASE_DEF = dict(
     ],
 )
 
-
 V2_HEAD_DEF = dict(
     defaults={
         # Note: these parameters of batch norm affect the architecture
@@ -72,41 +72,39 @@ V2_HEAD_DEF = dict(
     ],
 )
 
+
 def mobilenetv2_scope(is_training=True,
                       trainable=True,
                       weight_decay=0.00004,
                       stddev=0.09,
                       dropout_keep_prob=0.8,
                       bn_decay=0.997):
-  """Defines Mobilenet training scope.
-  In default. We do not use BN
+    """Defines Mobilenet training scope.
+    In default. We do not use BN
 
-  ReWrite the scope.
-  """
-  batch_norm_params = {
-      'is_training': False,
-      'trainable': False,
-      'decay': bn_decay,
-  }
-  with slim.arg_scope(training_scope(is_training=is_training, weight_decay=weight_decay)):
-      with slim.arg_scope([slim.conv2d, slim.fully_connected, slim.separable_conv2d],
-                          trainable=trainable):
-          with slim.arg_scope([slim.batch_norm], **batch_norm_params) as sc:
-              return sc
-
+    ReWrite the scope.
+    """
+    batch_norm_params = {
+        'is_training': False,
+        'trainable': False,
+        'decay': bn_decay,
+    }
+    with slim.arg_scope(training_scope(is_training=is_training, weight_decay=weight_decay)):
+        with slim.arg_scope([slim.conv2d, slim.fully_connected, slim.separable_conv2d],
+                            trainable=trainable):
+            with slim.arg_scope([slim.batch_norm], **batch_norm_params) as sc:
+                return sc
 
 
 def mobilenetv2_base(img_batch, is_training=True):
-
     with slim.arg_scope(mobilenetv2_scope(is_training=is_training, trainable=True)):
-
         feature_to_crop, endpoints = mobilenet_v2.mobilenet_base(input_tensor=img_batch,
-                                                      num_classes=None,
-                                                      is_training=False,
-                                                      depth_multiplier=1.0,
-                                                      scope='MobilenetV2',
-                                                      conv_defs=V2_BASE_DEF,
-                                                      finegrain_classification_mode=False)
+                                                                 num_classes=None,
+                                                                 is_training=False,
+                                                                 depth_multiplier=1.0,
+                                                                 scope='MobilenetV2',
+                                                                 conv_defs=V2_BASE_DEF,
+                                                                 finegrain_classification_mode=False)
 
         # feature_to_crop = tf.Print(feature_to_crop, [tf.shape(feature_to_crop)], summarize=10, message='rpn_shape')
         return feature_to_crop

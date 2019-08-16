@@ -28,7 +28,6 @@ class DetectionNetwork(object):
         self.num_anchors_per_location = len(cfgs.ANCHOR_SCALES) * len(cfgs.ANCHOR_RATIOS)
 
     def build_base_network(self, input_img_batch):
-
         if self.base_network_name.startswith('resnet_v1'):
             return resnet.resnet_base(input_img_batch, scope_name=self.base_network_name, is_training=self.is_training)
 
@@ -396,8 +395,7 @@ class DetectionNetwork(object):
         feature_to_cropped = self.build_base_network(input_img_batch)
 
         # 2. build rpn
-        with tf.variable_scope('build_rpn',
-                               regularizer=slim.l2_regularizer(cfgs.WEIGHT_DECAY)):
+        with tf.variable_scope('build_rpn', regularizer=slim.l2_regularizer(cfgs.WEIGHT_DECAY)):
 
             rpn_conv3x3 = slim.conv2d(
                 feature_to_cropped, 512, [3, 3],

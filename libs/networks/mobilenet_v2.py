@@ -80,15 +80,12 @@ def mobilenetv2_scope(is_training=True,
                       dropout_keep_prob=0.8,
                       bn_decay=0.997):
     """Defines Mobilenet training scope.
-    In default. We do not use BN
-
+    In default. We do not use BN.
     ReWrite the scope.
     """
-    batch_norm_params = {
-        'is_training': False,
-        'trainable': False,
-        'decay': bn_decay,
-    }
+
+    batch_norm_params = {'is_training': False, 'trainable': False, 'decay': bn_decay, }
+
     with slim.arg_scope(training_scope(is_training=is_training, weight_decay=weight_decay)):
         with slim.arg_scope([slim.conv2d, slim.fully_connected, slim.separable_conv2d],
                             trainable=trainable):
@@ -106,7 +103,8 @@ def mobilenetv2_base(img_batch, is_training=True):
                                                                  conv_defs=V2_BASE_DEF,
                                                                  finegrain_classification_mode=False)
 
-        # feature_to_crop = tf.Print(feature_to_crop, [tf.shape(feature_to_crop)], summarize=10, message='rpn_shape')
+        feature_to_crop = tf.Print(feature_to_crop, [tf.shape(feature_to_crop)], summarize=9,
+                                   message='debug message: rpn_shape')
         return feature_to_crop
 
 

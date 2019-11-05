@@ -5,7 +5,7 @@ from __future__ import division, print_function, absolute_import
 import os
 import tensorflow as tf
 
-# ------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 """
 system config
 """
@@ -13,13 +13,13 @@ system config
 VERSION = 'FasterRCNN_20180623_FDDB_mobile_v1'
 NET_NAME = 'MobilenetV2'  # 'resnet_v1_101' 'MobilenetV2'
 ADD_BOX_IN_TENSORBOARD = True
-# ------------------------------------------------
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 ROOT_PATH = os.path.abspath(current_directory + '/../..')
 
 print(16 * "++--")
 print("ROOT_PATH:", ROOT_PATH)
+# ----------------------------------------------------------------------------------------------------------------------
 
 GPU_GROUP = "0"
 SHOW_TRAIN_INFO_INTE = 10
@@ -68,9 +68,9 @@ LR = 0.0003  # 0.0003
 DECAY_STEP = [60000, 120000]  # 90000, 120000
 MAX_ITERATION = 200000
 
-# ------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 """
-data preprocess config
+data preprocessing config
 """
 
 DATASET_NAME = 'FDDB'  # 'ship', 'spacenet', 'pascal', 'coco', 'FDDB', 'WIDER'
@@ -78,7 +78,7 @@ PIXEL_MEAN = [123.68, 116.779, 103.939]  # R, G, B. In TensorFlow, channel is RG
 IMG_SHORT_SIDE_LEN = 600
 IMG_MAX_LENGTH = 1000
 CLASS_NUM = 1
-# ------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 # --------------------------------------------- Network_config
@@ -87,18 +87,20 @@ INITIALIZER = tf.random_normal_initializer(mean=0.0, stddev=0.01)
 BBOX_INITIALIZER = tf.random_normal_initializer(mean=0.0, stddev=0.001)
 WEIGHT_DECAY = 0.0001
 
-# ------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 """
 anchor config
 """
 
 BASE_ANCHOR_SIZE_LIST = [256]  # Can be modified
 ANCHOR_STRIDE = [16]  # Can not be modified in most situations
+
 ANCHOR_SCALES = [0.0625, 0.125, 0.25, 0.5, 1., 2.0]  # [4, 8, 16, 32]
-ANCHOR_RATIOS = [1, 1 / 2, 2.]
+ANCHOR_RATIOS = [1, 1 / 2., 2.]
+
 ROI_SCALE_FACTORS = [10., 10., 5.0, 5.0, 5.0]
 ANCHOR_SCALE_FACTORS = None
-# ------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
 
 # --------------------------------------------RPN config

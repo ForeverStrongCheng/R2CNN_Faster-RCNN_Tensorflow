@@ -118,12 +118,14 @@ __pycache__/
 */data/tfrecord/*
 
 
-# .idea folder
-.idea/
+
+
+
 
 # weights
 output/trained_weights/FasterRCNN_20180623_FDDB_mobile_v1/
 
 
 
-
+# .idea folder
+.idea/

@@ -9,6 +9,7 @@ import cv2
 
 from libs.configs import cfgs
 from libs.label_name_dict.label_dict import LABEl_NAME_MAP
+
 NOT_DRAW_BOXES = 0
 ONLY_DRAW_BOXES = -1
 ONLY_DRAW_BOXES_WITH_SCORES = -2
@@ -67,12 +68,11 @@ def draw_a_rectangel_in_img(draw_obj, box, color, width):
 
 
 def only_draw_scores(draw_obj, box, score, color):
-
     x, y = box[0], box[1]
-    draw_obj.rectangle(xy=[x, y, x+60, y+10],
+    draw_obj.rectangle(xy=[x, y, x + 60, y + 10],
                        fill=color)
     draw_obj.text(xy=(x, y),
-                  text="obj:" +str(round(score, 2)),
+                  text="obj:" + str(round(score, 2)),
                   fill='black',
                   font=FONT)
 
@@ -90,7 +90,6 @@ def draw_label_with_scores(draw_obj, box, label, score, color):
 
 
 def draw_boxes_with_label_and_scores(img_array, boxes, labels, scores):
-
     img_array = img_array + np.array(cfgs.PIXEL_MEAN)
     img_array.astype(np.float32)
     boxes = boxes.astype(np.int64)
@@ -110,8 +109,8 @@ def draw_boxes_with_label_and_scores(img_array, boxes, labels, scores):
             if a_label == ONLY_DRAW_BOXES:  # -1
                 continue
             elif a_label == ONLY_DRAW_BOXES_WITH_SCORES:  # -2
-                 only_draw_scores(draw_obj, box, a_score, color='White')
-                 continue
+                only_draw_scores(draw_obj, box, a_score, color='White')
+                continue
             else:
                 draw_label_with_scores(draw_obj, box, a_label, a_score, color='White')
 
@@ -125,7 +124,7 @@ def draw_box_cv(img, boxes, labels, scores):
     boxes = boxes.astype(np.int64)
     labels = labels.astype(np.int32)
     img = np.array(img, np.float32)
-    img = np.array(img*255/np.max(img), np.uint8)
+    img = np.array(img * 255 / np.max(img), np.uint8)
 
     num_of_object = 0
     for i, box in enumerate(boxes):
@@ -135,12 +134,9 @@ def draw_box_cv(img, boxes, labels, scores):
         if label != 0:
             num_of_object += 1
             # color = (np.random.randint(255), np.random.randint(255), np.random.randint(255))
-            color = (0, 255, 0)
-            cv2.rectangle(img,
-                          pt1=(xmin, ymin),
-                          pt2=(xmax, ymax),
-                          color=color,
-                          thickness=2)
+
+            color = (255, 0, 0)
+            cv2.rectangle(img, pt1=(xmin, ymin), pt2=(xmax, ymax), color=color, thickness=2)
 
             category = LABEl_NAME_MAP[label]
 
@@ -170,12 +166,9 @@ def draw_box_cv(img, boxes, labels, scores):
             #                 fontScale=1,
             #                 thickness=2,
             #                 color=(color[1], color[2], color[0]))
-    cv2.putText(img,
-                text=str(num_of_object),
-                org=((img.shape[1]) // 2, (img.shape[0]) // 2),
-                fontFace=3,
-                fontScale=1,
-                color=(255, 0, 0))
+
+    cv2.putText(img, text=str(num_of_object), org=((img.shape[1]) // 2, (img.shape[0]) // 2), fontFace=3, fontScale=1,
+                color=(0, 255, 0))
     return img
 
 
@@ -183,8 +176,9 @@ def draw_rotate_box_cv(img, boxes, labels, scores):
     img = img + np.array(cfgs.PIXEL_MEAN)
     boxes = boxes.astype(np.int64)
     labels = labels.astype(np.int32)
+
     img = np.array(img, np.float32)
-    img = np.array(img*255/np.max(img), np.uint8)
+    img = np.array(img * 255 / np.max(img), np.uint8)
 
     num_of_object = 0
     for i, box in enumerate(boxes):
@@ -194,7 +188,7 @@ def draw_rotate_box_cv(img, boxes, labels, scores):
         if label != 0:
             num_of_object += 1
             # color = (np.random.randint(255), np.random.randint(255), np.random.randint(255))
-            color = (0, 255, 0)
+            color = (255, 0, 0)
             rect = ((x_c, y_c), (w, h), theta)
             rect = cv2.boxPoints(rect)
             rect = np.int0(rect)
@@ -228,12 +222,9 @@ def draw_rotate_box_cv(img, boxes, labels, scores):
             #                 fontScale=1,
             #                 thickness=2,
             #                 color=(color[1], color[2], color[0]))
-    cv2.putText(img,
-                text=str(num_of_object),
-                org=((img.shape[1]) // 2, (img.shape[0]) // 2),
-                fontFace=3,
-                fontScale=1,
-                color=(255, 0, 0))
+
+    cv2.putText(img, text=str(num_of_object), org=((img.shape[1]) // 2, (img.shape[0]) // 2), fontFace=3, fontScale=1,
+                color=(0, 255, 0))
     return img
 
 
@@ -249,7 +240,7 @@ if __name__ == '__main__':
     # test only draw boxes
     labes = np.ones(shape=[len(boxes), ], dtype=np.float32) * ONLY_DRAW_BOXES
     scores = np.zeros_like(labes)
-    imm = draw_boxes_with_label_and_scores(img_array, boxes, labes ,scores)
+    imm = draw_boxes_with_label_and_scores(img_array, boxes, labes, scores)
     # imm = np.array(imm)
 
     cv2.imshow("te", imm)
@@ -267,10 +258,3 @@ if __name__ == '__main__':
     cv2.imshow("te3", imm3)
 
     cv2.waitKey(0)
-
-
-
-
-
-
-

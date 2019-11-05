@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Yongqiang Cheng
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -49,7 +50,7 @@ def capture_video_from_camera(device_index):
 
 
 def inference(det_net, device_index):
-    # preprocess image
+    # preprocessing data
     img_placeholder = tf.placeholder(dtype=tf.uint8, shape=[None, None, 3])
     img_batch = tf.cast(img_placeholder, tf.float32)
     img_batch = img_batch - tf.constant(cfgs.PIXEL_MEAN)
@@ -92,6 +93,8 @@ def inference(det_net, device_index):
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         video_writer = cv2.VideoWriter('%s/OBB_camera_face.avi' % (tmp_directory), fourcc, fps, size)
 
+        cv2.namedWindow("Press q on keyboard to exit.", cv2.WINDOW_NORMAL)
+
         while (cap.isOpened()):
             # Capture frame-by-frame
             ret, frame = cap.read()
@@ -110,37 +113,38 @@ def inference(det_net, device_index):
 
             end = time.time()
 
-            # det_detections_h = draw_box_in_img.draw_box_cv(np.squeeze(resized_img, 0),
-            #                                                boxes=det_boxes_h_,
-            #                                                labels=det_category_h_,
-            #                                                scores=det_scores_h_)
-            det_detections_r = draw_box_in_img.draw_rotate_box_cv(np.squeeze(resized_img, 0),
-                                                                  boxes=det_boxes_r_,
-                                                                  labels=det_category_r_,
-                                                                  scores=det_scores_r_)
+            det_detections_h = draw_box_in_img.draw_box_cv(np.squeeze(resized_img, 0), boxes=det_boxes_h_,
+                                                           labels=det_category_h_, scores=det_scores_h_)
 
-            # det_detections_h = cv2.resize(det_detections_h,
-            #                               (det_detections_h.shape[0] // 2, det_detections_h.shape[1] // 2))
-            # cv2.putText(det_detections_h, text="HBB - %3.2fps" % (1 / (end - start)), org=(0, 0), fontFace=3,
-            #             fontScale=1, color=(255, 0, 0))
-            # det_detections_r = cv2.resize(det_detections_r,
-            #                               (det_detections_r.shape[0] // 2, det_detections_r.shape[1] // 2))
+            det_detections_r = draw_box_in_img.draw_rotate_box_cv(np.squeeze(resized_img, 0), boxes=det_boxes_r_,
+                                                                  labels=det_category_r_, scores=det_scores_r_)
 
-            cv2.putText(det_detections_r, text="OBB - %3.2fps" % (1 / (end - start)), org=(10, 10), fontFace=1,
+            # height, width, number of channels in image
+            # height = image.shape[0], width = image.shape[1], channels = image.shape[2]
+
+            det_detections_h = cv2.resize(det_detections_h,
+                                          (det_detections_h.shape[1] // 2, det_detections_h.shape[0] // 2))
+            cv2.putText(det_detections_h, text="HBB - %3.2fps" % (1 / (end - start)), org=(10, 10), fontFace=1,
                         fontScale=1, color=(0, 255, 0))
 
-            video_writer.write(det_detections_r)
+            det_detections_r = cv2.resize(det_detections_r,
+                                          (det_detections_r.shape[1] // 2, det_detections_r.shape[0] // 2))
+            cv2.putText(det_detections_r, text="OBB - %3.2fps" % (1.0 / (end - start)), org=(10, 10), fontFace=1,
+                        fontScale=1, color=(0, 255, 0))
 
-            # hmerge = np.hstack((det_detections_h, det_detections_r))  # 水平拼接
+            # Stack arrays in sequence horizontally (column wise).
+            hstack_data = np.hstack((det_detections_h, det_detections_r))
+
+            video_writer.write(frame)
 
             # Display the resulting frame
-            cv2.imshow("Press q on keyboard to exit.", det_detections_r)
+            cv2.imshow("Press q on keyboard to exit.", hstack_data)
 
             # Press q on keyboard to exit.
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        # When everything done, release the capture
+        # When everything done, release the capture.
         cap.release()
         video_writer.release()
         cv2.destroyAllWindows()

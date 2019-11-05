@@ -79,7 +79,7 @@ def inference(image_file):
 
         k = cv2.waitKey(0)
         if k == 27:  # wait for ESC key to exit
-            cv2.destroyAllWindows()
+            pass
         elif k == ord('s'):  # wait for 's' key to save and exit
             image_name = "%s/%s.jpg" % (tmp_directory, "resized_image")
             cv2.imwrite(image_name, resized_img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])

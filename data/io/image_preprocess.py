@@ -37,6 +37,7 @@ def short_side_resize_for_inference_data(img_tensor, target_shortside_len, is_re
     h, w, = tf.shape(img_tensor)[0], tf.shape(img_tensor)[1]
 
     img_tensor = tf.expand_dims(img_tensor, axis=0)
+    # 4-D with shape [batch, height, width, channels].
 
     if is_resize:
         new_h, new_w = tf.cond(tf.less(h, w),

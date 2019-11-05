@@ -140,32 +140,15 @@ def draw_box_cv(img, boxes, labels, scores):
 
             category = LABEl_NAME_MAP[label]
 
-            # if scores is not None:
-            #     cv2.rectangle(img,
-            #                   pt1=(xmin, ymin),
-            #                   pt2=(xmin+150, ymin+15),
-            #                   color=color,
-            #                   thickness=-1)
-            #     cv2.putText(img,
-            #                 text=category+": "+str(scores[i]),
-            #                 org=(xmin, ymin+10),
-            #                 fontFace=1,
-            #                 fontScale=1,
-            #                 thickness=2,
-            #                 color=(color[1], color[2], color[0]))
-            # else:
-            #     cv2.rectangle(img,
-            #                   pt1=(xmin, ymin),
-            #                   pt2=(xmin + 40, ymin + 15),
-            #                   color=color,
-            #                   thickness=-1)
-            #     cv2.putText(img,
-            #                 text=category,
-            #                 org=(xmin, ymin + 10),
-            #                 fontFace=1,
-            #                 fontScale=1,
-            #                 thickness=2,
-            #                 color=(color[1], color[2], color[0]))
+            if scores is not None:
+                pad_score = "%.2f" % (scores[i])
+                cv2.rectangle(img, pt1=(xmin, ymin), pt2=(xmax, ymin + 24), color=color, thickness=2)
+                cv2.putText(img, text=category + ": " + str(pad_score), org=(xmin + 2, ymin + 20), fontFace=0,
+                            fontScale=0.8, thickness=2, color=(color[1], color[0], color[2]))
+            else:
+                cv2.rectangle(img, pt1=(xmin, ymin), pt2=(xmax, ymin + 24), color=color, thickness=-1)
+                cv2.putText(img, text=category, org=(xmin + 2, ymin + 20), fontFace=0, fontScale=0.8, thickness=2,
+                            color=(color[1], color[0], color[2]))
 
     cv2.putText(img, text=str(num_of_object), org=((img.shape[1]) // 2, (img.shape[0]) // 2), fontFace=3, fontScale=1,
                 color=(0, 255, 0))
@@ -176,7 +159,6 @@ def draw_rotate_box_cv(img, boxes, labels, scores):
     img = img + np.array(cfgs.PIXEL_MEAN)
     boxes = boxes.astype(np.int64)
     labels = labels.astype(np.int32)
-
     img = np.array(img, np.float32)
     img = np.array(img * 255 / np.max(img), np.uint8)
 

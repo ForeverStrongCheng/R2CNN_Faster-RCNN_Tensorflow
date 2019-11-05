@@ -113,6 +113,7 @@ def inference(det_net, device_index):
 
             end = time.time()
 
+            # print("resized_img.shape:", resized_img.shape)
             det_detections_h = draw_box_in_img.draw_box_cv(np.squeeze(resized_img, 0), boxes=det_boxes_h_,
                                                            labels=det_category_h_, scores=det_scores_h_)
 
@@ -175,6 +176,8 @@ def parsing_arguments():
 if __name__ == '__main__':
     device_index = 0
     # capture_video_from_camera(device_index)
+
+    print("current_directory:", current_directory)
 
     print("sys.argv:", sys.argv)
     args = parsing_arguments()

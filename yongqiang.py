@@ -17,7 +17,24 @@ import numpy as np
 import cv2
 import time
 
+print(16 * "++--")
+print("current_directory:", current_directory)
 
+x = np.arange(9).reshape(1, 3, 3)
+
+print('Array X:')
+print(x)
+print('\n')
+y = np.squeeze(x)
+
+print('Array Y:')
+print(y)
+print('\n')
+
+print('The shapes of X and Y array:')
+print(x.shape, y.shape)
+
+'''
 def inference(image_file, current_directory):
     img = cv2.imread(image_file, cv2.IMREAD_COLOR)
 
@@ -73,3 +90,4 @@ if __name__ == '__main__':
     print("os.environ['CUDA_VISIBLE_DEVICES']:", os.environ['CUDA_VISIBLE_DEVICES'])
 
     inference(image_file, current_directory)
+'''

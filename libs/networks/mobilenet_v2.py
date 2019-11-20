@@ -103,8 +103,9 @@ def mobilenetv2_base(img_batch, is_training=True):
                                                                  conv_defs=V2_BASE_DEF,
                                                                  finegrain_classification_mode=False)
 
-        feature_to_crop = tf.Print(feature_to_crop, [tf.shape(feature_to_crop)], summarize=9,
-                                   message='debug message: rpn_shape')
+        # debug message:[1 30 40 96][tf.shape(feature_to_crop)]
+        feature_to_crop = tf.Print(feature_to_crop, [tf.shape(feature_to_crop), "tf.shape(feature_to_crop)"], summarize=9, message='debug message:')
+
         return feature_to_crop
 
 

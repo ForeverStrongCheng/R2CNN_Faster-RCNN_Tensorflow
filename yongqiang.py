@@ -12,12 +12,31 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
+print(16 * "++--")
+print("current_directory:", current_directory)
+
 import numpy as np
-# import tensorflow as tf
+import tensorflow as tf
 import cv2
 import time
 
+weights = tf.constant([[1.0, -2.0], [-3.0, 4.0]])
 
+# output: (|1| + |-2| + |-3| + |4|) * 0.5 = 5  \lambda = 0.5
+L1_regularizer = tf.contrib.layers.l1_regularizer(0.5)(weights)  # 5
+
+# output: (|1|^2 + |-2|^2 + |-3|^2 + |4|^2) / 2 * 0.5 = 7.5  \lambda = 0.5
+L2_regularizer = tf.contrib.layers.l2_regularizer(0.5)(weights)  # 7.5
+
+with tf.Session() as sess:
+    print(sess.run(weights))
+
+    # output: (|1| + |-2| + |-3| + |4|) * 0.5 = 5  \lambda = 0.5
+    print(sess.run(L1_regularizer))  # 5
+    # output: (|1|^2 + |-2|^2 + |-3|^2 + |4|^2) / 2 * 0.5 = 7.5  \lambda = 0.5
+    print(sess.run(L2_regularizer))  # 7.5
+
+'''
 def inference(image_file, current_directory):
     img = cv2.imread(image_file, cv2.IMREAD_COLOR)
 
@@ -92,3 +111,4 @@ if __name__ == '__main__':
     print("os.environ['CUDA_VISIBLE_DEVICES']:", os.environ['CUDA_VISIBLE_DEVICES'])
 
     inference(image_file, current_directory)
+'''

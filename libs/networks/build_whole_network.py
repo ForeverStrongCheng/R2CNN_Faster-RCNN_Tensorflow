@@ -388,13 +388,16 @@ class DetectionNetwork(object):
             gtboxes_h_batch = tf.cast(gtboxes_h_batch, tf.float32)
 
         img_shape = tf.shape(input_img_batch)
-        # debug message:[1 h w 3][yongqiang]
-        # img_shape = tf.Print(img_shape, [img_shape, "yongqiang"], message='debug message:', summarize=9)
+        # debug message:[1 480 640 3][tf.shape(input_img_batch)]
+        # img_shape = tf.Print(img_shape, [img_shape, "tf.shape(input_img_batch)"], message='debug message:', summarize=9)
 
         # 1. build base network
         feature_to_cropped = self.build_base_network(input_img_batch)
+        # debug message:[1 30 40 96][tf.shape(feature_to_cropped)]
+        # feature_to_cropped = tf.Print(feature_to_cropped, [tf.shape(feature_to_cropped), "tf.shape(feature_to_cropped)"], message='debug message:', summarize=9)
 
-        # 2. build rpn
+
+        # 2. build Region Proposal Network (RPN)
         with tf.variable_scope('build_rpn', regularizer=slim.l2_regularizer(cfgs.WEIGHT_DECAY)):
 
             rpn_conv3x3 = slim.conv2d(

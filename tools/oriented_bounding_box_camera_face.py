@@ -61,8 +61,8 @@ def inference(det_net, device_index):
 
     det_boxes_h, det_scores_h, det_category_h, \
     det_boxes_r, det_scores_r, det_category_r = det_net.build_whole_detection_network(input_img_batch=img_batch,
-                                                                                      gtboxes_h_batch=None,
-                                                                                      gtboxes_r_batch=None)
+                                                                                      gtboxes_r_batch=None,
+                                                                                      gtboxes_h_batch=None)
 
     init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
 
@@ -110,6 +110,9 @@ def inference(det_net, device_index):
                 sess.run(
                     [img_batch, det_boxes_h, det_scores_h, det_category_h, det_boxes_r, det_scores_r, det_category_r],
                     feed_dict={img_placeholder: frame})
+
+            # feed_dict={img_placeholder: frame} Color image loaded by OpenCV is in BGR mode.
+            # feed_dict={img_plac: frame[:, :, ::-1]} BGR mode -> RGB mode.
 
             end = time.time()
 
